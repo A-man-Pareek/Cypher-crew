@@ -2,74 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login | Cypher-Crew</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Serene 🌿</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #020617;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
-        .box {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 10px;
-            width: 300px;
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        h2 {
-            text-align: center;
+
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            background: #22c55e;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        a {
-            color: #22c55e;
-            text-decoration: none;
+
+        .input-field:focus {
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+            border-color: #6c5ce7;
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center h-screen overflow-hidden relative">
 
-<div class="box">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button onclick="login()">Login</button>
-    <p>No account? <a href="/register">Register</a></p>
-</div>
+    <div class="absolute top-10 left-10 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+    <div class="absolute top-10 right-10 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
 
-<script>
-    function login() {
-        const savedUser = JSON.parse(localStorage.getItem("user"));
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    <div class="glass w-96 p-8 z-10 text-center transform transition duration-500 hover:scale-[1.02]">
+        
+        <div class="mb-6">
+            <h2 class="text-3xl font-bold text-white drop-shadow-md">Welcome Back 🌿</h2>
+            <p class="text-white/80 text-sm mt-2">Find your peace with Serene</p>
+        </div>
 
-        if (!savedUser) {
-            alert("No user found. Please register first.");
-            return;
+        <div class="space-y-4">
+            <div class="relative">
+                <input type="text" id="user" placeholder="Username" 
+                    class="input-field w-full px-4 py-3 rounded-lg bg-white/70 border border-white/50 focus:outline-none focus:bg-white text-gray-800 placeholder-gray-500 transition-all duration-300" />
+            </div>
+
+            <div class="relative">
+                <input type="password" id="pass" placeholder="Password" 
+                    class="input-field w-full px-4 py-3 rounded-lg bg-white/70 border border-white/50 focus:outline-none focus:bg-white text-gray-800 placeholder-gray-500 transition-all duration-300" />
+            </div>
+
+            <button onclick="login()" 
+                class="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow-lg transform transition hover:-translate-y-1 active:scale-95 duration-200">
+                Log In
+            </button>
+        </div>
+
+        <p class="mt-6 text-white text-sm">
+            New here? 
+            <a href="/register" class="font-bold underline hover:text-yellow-300 transition-colors">Create Account</a>
+        </p>
+
+        <p id="error" class="mt-4 text-sm font-semibold text-red-100 bg-red-500/50 rounded-lg py-1 px-2 hidden"></p>
+    </div>
+
+    <script>
+        // Custom animation setup for blobs in CSS (Tailwind config simulation)
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes blob {
+                0% { transform: translate(0px, 0px) scale(1); }
+                33% { transform: translate(30px, -50px) scale(1.1); }
+                66% { transform: translate(-20px, 20px) scale(0.9); }
+                100% { transform: translate(0px, 0px) scale(1); }
+            }
+            .animate-blob { animation: blob 7s infinite; }
+            .animation-delay-2000 { animation-delay: 2s; }
+            .animation-delay-4000 { animation-delay: 4s; }
+        `;
+        document.head.appendChild(style);
+
+        // --- AUTH LOGIC (EXACTLY AS BEFORE) ---
+        async function login() {
+            let u = document.getElementById('user').value;
+            let p = document.getElementById('pass').value;
+            let errorMsg = document.getElementById('error');
+
+            // Hide error initially
+            errorMsg.classList.add('hidden');
+            errorMsg.innerText = "";
+
+            if(!u || !p) {
+                errorMsg.innerText = "Please fill all fields";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                let res = await fetch('/login_api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+
+                let data = await res.json();
+
+                if (data.success) {
+                    // Success logic
+                    window.location.href = "/chat";
+                } else {
+                    // Show error styling
+                    errorMsg.innerText = data.message;
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.innerText = "Server Error. Check console.";
+                errorMsg.classList.remove('hidden');
+                console.error(err);
+            }
         }
-
-        if (email === savedUser.email && password === savedUser.password) {
-            alert("Login successful!");
-            // redirect to dashboard
-            // window.location.href = "dashboard.html";
-        } else {
-            alert("Invalid email or password!");
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>

@@ -17,7 +17,7 @@ app.secret_key = os.getenv("FLASK_SECRET", "hackathon_secret_key")
 raw_key = os.getenv("GEMINI_API_KEY")
 API_KEY = raw_key.strip() if raw_key else None
 
-# --- 2. MODELS (Fixed: Reverted to 1.5 to avoid Quota Errors) ---
+# --- 2. MODELS (Fixed: Using 1.5 to prevent crash/quota error) ---
 MODELS_TO_TRY = ["gemini-2.5-flash", "gemini-2.5-pro"]
 
 YOGA_SOLUTIONS = {
@@ -58,27 +58,32 @@ def logout():
     session.clear()
     return redirect(url_for('login_page'))
 
-# --- 4. AUTHENTICATION APIs ---
+# --- 4. AUTHENTICATION APIs (Logic Updated for Redirect) ---
 
 @app.route('/register_api', methods=['POST'])
 def register_api():
     data = request.json
-    # Debug print to check if data is arriving
     print(f"Attempting to register: {data.get('username')}")
     
     user_id = db_helper.create_user(data.get('username'), data.get('password'))
     
     if user_id:
+        # 🔥 FIX: Auto-Login (Session Set) taaki seedha chat khule
+        session['user_id'] = str(user_id)
         return jsonify({"success": True, "message": "Registered successfully!"})
+    
     return jsonify({"success": False, "message": "Username taken."})
 
 @app.route('/login_api', methods=['POST'])
 def login_api():
     data = request.json
     user = db_helper.verify_user(data.get('username'), data.get('password'))
+    
     if user:
+        # 🔥 FIX: Login Success hone par Session ID set karna zaroori hai
         session['user_id'] = str(user['_id'])
         return jsonify({"success": True, "message": "Login successful!"})
+    
     return jsonify({"success": False, "message": "Invalid credentials."})
 
 # --- 5. MAIN CHAT API ---

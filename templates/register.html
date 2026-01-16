@@ -2,73 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register | Cypher-Crew</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Serene</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-        }
-        .box {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 10px;
-            width: 300px;
-        }
-        h2 {
-            text-align: center;
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            background: #38bdf8;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        a {
-            color: #38bdf8;
-            text-decoration: none;
-        }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; font-family: sans-serif; }
+        .card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #219150; }
+        a { color: #27ae60; text-decoration: none; font-weight: bold; }
+        #msg { margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
+    <div class="card">
+        <h2>Create Account ✨</h2>
+        <input type="text" id="user" placeholder="Choose Username">
+        <input type="password" id="pass" placeholder="Choose Password">
+        <button onclick="register()">Sign Up</button>
+        <p style="margin-top: 20px;">Already have an account? <a href="/login">Login</a></p>
+        <p id="msg"></p>
+    </div>
 
-<div class="box">
-    <h2>Register</h2>
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button onclick="register()">Register</button>
-    <p>Already have an account? <a href="/login">Login</a></p>
-</div>
+    <script>
+        async function register() {
+            let u = document.getElementById('user').value;
+            let p = document.getElementById('pass').value;
+            let msg = document.getElementById('msg');
 
-<script>
-    function register() {
-        const user = {
-            username: document.getElementById("username").value,
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value
-        };
+            if(!u || !p) {
+                msg.innerText = "Please fill all fields";
+                return;
+            }
 
-        if (!user.username || !user.email || !user.password) {
-            alert("All fields are required!");
-            return;
+            msg.innerText = "Creating Account...";
+
+            try {
+                let res = await fetch('/register_api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+
+                let data = await res.json();
+
+                if (data.success) {
+                    msg.style.color = "green";
+                    msg.innerText = "Account Created! Redirecting...";
+                    // 🔥 YEH LINE TUJHE CHAT PAR LE JAYEGI
+                    setTimeout(() => window.location.href = "/chat", 1000);
+                } else {
+                    msg.style.color = "red";
+                    msg.innerText = data.message;
+                }
+            } catch (err) {
+                msg.innerText = "Server Error. Check console.";
+                console.error(err);
+            }
         }
-
-        localStorage.setItem("user", JSON.stringify(user));
-        alert("Registration successful!");
-        window.location.href = "/login";
-    }
-</script>
-
+    </script>
 </body>
 </html>
