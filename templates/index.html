@@ -9,7 +9,7 @@
 <body>
 
     <div class="main-container">
-        <h1>🌿 Serene Bot</h1>
+        <h1> Serene Bot</h1>
         
         <div id="chat-box">
             <div class="bot-msg">Hello! I am here to listen. How are you feeling?</div>
@@ -21,16 +21,26 @@
         </div>
     </div>
 
-    <div id="breathing-container">
-        <div class="circle"></div>
-        <div class="instruction-text">Inhale... Hold... Exhale...</div>
+   <div id="breathing-container">
+    <div class="breathing-wrapper">
+        <div class="circle-layer layer-1"></div>
+        <div class="circle-layer layer-2"></div>
+        <div class="circle-layer layer-3"></div>
+        <div class="instruction-text" id="breath-text">Inhale...</div>
+    </div>
+</div>
+   <div id="yoga-card">
+    <div class="card-header">
+        <h3>🧘‍♀️ Quick Relief</h3>
+        <span class="close-btn" onclick="closeYogaCard()">×</span>
+    </div>
+    
+    <div class="visual-container">
+        <img id="yoga-visual" src="" alt="Yoga Exercise">
     </div>
 
-    <div id="yoga-card">
-        <span class="close-btn" onclick="closeYogaCard()">×</span>
-        <h3>🧘‍♀️ Daily Wellness Tip</h3>
-        <p id="yoga-instruction">Take a deep breath.</p>
-    </div>
+    <p id="yoga-instruction">Loading exercise...</p>
+</div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

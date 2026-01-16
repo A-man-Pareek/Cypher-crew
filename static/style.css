@@ -82,55 +82,157 @@ button {
 }
 
 /* --- ✨ BREATHING ANIMATION --- */
+/* --- ✨ ADVANCED BREATHING ANIMATION --- */
 #breathing-container {
-    display: none;
+    display: none; /* JS isse show karega */
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 1000;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.9); /* Dark Blue calming background */
+    z-index: 2000;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    backdrop-filter: blur(5px);
 }
 
-.circle {
-    width: 100px;
-    height: 100px;
-    background-color: #89CFF0;
+.breathing-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Common style for all circles */
+.circle-layer {
+    position: absolute;
     border-radius: 50%;
-    box-shadow: 0 0 30px #89CFF0;
-    animation: breathe 5s infinite ease-in-out;
+    mix-blend-mode: screen;
 }
 
+/* Core Circle (Brightest) */
+.layer-1 {
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, #a2d2ff, #4ea8de);
+    box-shadow: 0 0 40px #4ea8de;
+    animation: breathe-core 6s infinite ease-in-out;
+    z-index: 3;
+}
+
+/* Middle Ripple */
+.layer-2 {
+    width: 140px; height: 140px;
+    background: rgba(78, 168, 222, 0.4);
+    animation: breathe-ripple 6s infinite ease-in-out;
+    animation-delay: 0.2s; /* Thoda late chalega */
+    z-index: 2;
+}
+
+/* Outer Ripple */
+.layer-3 {
+    width: 180px; height: 180px;
+    border: 2px solid rgba(162, 210, 255, 0.3);
+    animation: breathe-ripple 6s infinite ease-in-out;
+    animation-delay: 0.4s; /* Aur late chalega */
+    z-index: 1;
+}
+
+/* Text Styling */
 .instruction-text {
+    position: absolute;
     color: white;
-    margin-top: 30px;
     font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    z-index: 10;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    animation: text-pulse 6s infinite ease-in-out;
 }
 
-@keyframes breathe {
-    0% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(2.5); opacity: 0.3; }
-    100% { transform: scale(1); opacity: 0.6; }
+/* --- ANIMATION KEYFRAMES --- */
+
+/* Core Circle Animation */
+@keyframes breathe-core {
+    0%, 100% { transform: scale(1); opacity: 0.8; } /* Exhale State */
+    50% { transform: scale(1.5); opacity: 1; }      /* Inhale State */
 }
 
+/* Ripple Animation */
+@keyframes breathe-ripple {
+    0%, 100% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.8); opacity: 0.6; }
+}
+
+/* Text Changing Animation */
+@keyframes text-pulse {
+    0%, 100% { opacity: 0.5; content: "Exhale..."; }
+    50% { opacity: 1; content: "Inhale..."; }
+}
 /* --- 🧘 YOGA CARD --- */
+/* --- 🧘 BIGGER YOGA CARD --- */
 #yoga-card {
     display: none;
     position: fixed;
-    bottom: 20px; right: 20px;
-    width: 250px;
+    bottom: 20px; 
+    right: 20px;
+    width: 320px; /* Thoda chouda kiya */
     background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    border-left: 5px solid #FF9800;
+    padding: 0; /* Padding hatayi taaki image edge-to-edge ho */
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     z-index: 100;
+    overflow: hidden; /* Image corners round rakhne ke liye */
+    animation: slideIn 0.5s ease-out;
+}
+
+.card-header {
+    padding: 15px;
+    background: #FF9800; /* Orange Header */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.visual-container {
+    width: 100%;
+    height: 200px; /* Badi height video ke liye */
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#yoga-visual {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Image ko crop karke fit karega */
+}
+
+#yoga-instruction {
+    padding: 15px;
+    color: #555;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    margin: 0;
 }
 
 .close-btn {
-    float: right;
     cursor: pointer;
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #888;
+}
+
+/* Card Animation */
+@keyframes slideIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
