@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MindCare AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <h2>MindCare AI</h2>
+
+    <div class="sidebar-item active">📝 New Chat</div>
+    <div class="sidebar-item">🧠 Daily Check-in</div>
+    <div class="sidebar-item">📊 Mood History</div>
+    <div class="sidebar-item">🛠 Coping Support</div>
+    <div class="sidebar-item danger">🚨 Emergency Help</div>
+
+    <p class="sidebar-note">
+      Mental wellness support,<br>not a medical replacement.
+    </p>
+  </aside>
+
+  <!-- CHAT AREA -->
+  <main class="chat">
+
+    <div class="chat-header">
+      <h3>Your Mental Wellness Assistant</h3>
+      <p>Speak freely. I’m here to listen.</p>
+    </div>
+
+    <div class="chat-container" id="chatContainer"></div>
+    <div class="typing" id="typing">MindCare is typing...</div>
+
+    <div class="input-area">
+      <input
+        id="userInput"
+        type="text"
+        placeholder="Share what’s on your mind..."
+        onkeydown="handleKeyPress(event)"
+      />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
