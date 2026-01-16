@@ -23,10 +23,32 @@ document.addEventListener("DOMContentLoaded", function() {
             // Show Bot Message
             appendMessage("bot-msg", data.reply);
 
-            // --- TRIGGERS ---
+            // --- A. MOOD AMBIENCE LOGIC (Frontend Instant Trigger) ---
+            let msg = message.toLowerCase();
+
+            if (msg.includes("sad") || msg.includes("lonely") || msg.includes("depressed") || msg.includes("cry")) {
+                setMood("mood-sad", "audio-rain");
+            } 
+            else if (msg.includes("happy") || msg.includes("excited") || msg.includes("good") || msg.includes("joy")) {
+                setMood("mood-happy", "audio-birds");
+            }
+            else if (msg.includes("stress") || msg.includes("anxious") || msg.includes("panic") || msg.includes("nervous")) {
+                setMood("mood-stressed", "audio-stream");
+            }
+            else if (msg.includes("angry") || msg.includes("mad") || msg.includes("furious") || msg.includes("hate")) {
+                setMood("mood-angry", "audio-fire");
+            }
+            else if (msg.includes("tired") || msg.includes("sleepy") || msg.includes("exhausted")) {
+                setMood("mood-tired", "audio-night");
+            }
+            
+            // --- B. FEATURE TRIGGERS (Backend Logic) ---
+            // (Yeh part tumne miss kar diya tha, ab wapas daal diya hai)
+            
             if (data.show_breathing) {
                 activateBreathing();
             }
+
             if (data.show_yoga) {
                 activateYoga(data.yoga_tip, data.yoga_gif);
             }
@@ -48,19 +70,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function activateBreathing() {
         let container = document.getElementById("breathing-container");
-        let textElement = document.querySelector(".instruction-text"); // Class selector used here
+        let textElement = document.querySelector(".instruction-text");
         
         if(container) {
             container.style.display = "flex"; 
             
-            // Text Loop Logic
+            // Animation Loop logic
             if(textElement) {
                 textElement.innerText = "Inhale...";
                 let breathInterval = setInterval(() => {
                     textElement.innerText = "Inhale...";
                     setTimeout(() => {
                         textElement.innerText = "Exhale...";
-                    }, 2500); // Sync with CSS animation duration (5s total)
+                    }, 2500); 
                 }, 5000);
 
                 // Stop after 15 seconds
@@ -69,7 +91,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     clearInterval(breathInterval);
                 }, 15000);
             } else {
-                // Fallback if text element missing
                 setTimeout(() => { container.style.display = "none"; }, 7000);
             }
         }
@@ -82,13 +103,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (card && instruction && visual) {
             instruction.innerText = tip;
-            // Use GIF from backend, or fallback
             visual.src = gifUrl || "https://media.giphy.com/media/1xVbRXc1wY5Jt6cOaN/giphy.gif";
             card.style.display = "block";
         }
     }
 
-    // --- 3. EVENT LISTENERS (Yeh Miss Ho Gaye The) ---
+    // --- 3. EVENT LISTENERS ---
     if (sendBtn) {
         sendBtn.addEventListener("click", sendMessage);
     }
@@ -102,8 +122,40 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// --- 4. GLOBAL FUNCTION (Taaki HTML onclick isse access kar sake) ---
+// --- 4. GLOBAL FUNCTIONS (Accessible by HTML onclick) ---
+
 function closeYogaCard() {
     let card = document.getElementById("yoga-card");
     if (card) card.style.display = "none";
+}
+
+function setMood(moodClass, audioId) {
+    // 1. Reset Body Classes
+    document.body.className = ""; 
+    
+    // 2. Add New Mood Class
+    if (moodClass) {
+        document.body.classList.add(moodClass);
+    }
+
+    // 3. Audio Management
+    stopAllSounds();
+    if (audioId) {
+        let audio = document.getElementById(audioId);
+        if (audio) {
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log("Audio autoplay blocked via browser settings"));
+        }
+    }
+}
+
+function stopAllSounds() {
+    const sounds = ["audio-rain", "audio-birds", "audio-stream", "audio-fire", "audio-night"];
+    sounds.forEach(id => {
+        let audio = document.getElementById(id);
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    });
 }

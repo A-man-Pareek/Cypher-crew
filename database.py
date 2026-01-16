@@ -55,20 +55,30 @@ class Database:
         return None
 
     # --- 2. MOOD TRACKING ---
+# --- 2. MOOD TRACKING (Updated: Ab kabhi reject nahi karega) ---
     def add_mood(self, user_id, mood_score, emotion_label, note):
-        # Agar guest user hai (anonymous), toh save mat karo
-        if user_id == "anonymous" or not ObjectId.is_valid(user_id):
-            return 
-            
+        # Fix: Agar User ID kharab hai, toh nayi bana lo par data SAVE karo!
+        try:
+            if not user_id or not ObjectId.is_valid(str(user_id)):
+                # Agar ID valid nahi hai, toh ek nayi temporary ID bana do
+                valid_user_id = ObjectId()
+            else:
+                # Agar sahi hai toh wahi use karo
+                valid_user_id = ObjectId(user_id)
+        except Exception:
+            valid_user_id = ObjectId()
+
         log = {
-            "user_id": ObjectId(user_id),
+            "user_id": valid_user_id,
             "mood_score": mood_score,
             "emotion_label": emotion_label,
             "note": note,
             "timestamp": datetime.now()
         }
+        
+        # Save to Database
         self.mood_logs.insert_one(log)
-
+        
     def get_dashboard_data(self, user_id, limit=30):
         if not ObjectId.is_valid(user_id):
             return []
