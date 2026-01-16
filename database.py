@@ -55,7 +55,6 @@ class Database:
         return None
 
     # --- 2. MOOD TRACKING ---
-# --- 2. MOOD TRACKING (Updated: Ab kabhi reject nahi karega) ---
     def add_mood(self, user_id, mood_score, emotion_label, note):
         # Fix: Agar User ID kharab hai, toh nayi bana lo par data SAVE karo!
         try:
@@ -105,5 +104,5 @@ class Database:
             })
             return f"Deleted {result.deleted_count} records from today."
 
-# Initialize (Is variable ko hum app.py mein import karenge)
+# Initialize
 db_helper = Database()

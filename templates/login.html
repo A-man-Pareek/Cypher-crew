@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Cypher-Crew</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #020617;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+        .box {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 10px;
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: #22c55e;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        a {
+            color: #22c55e;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p>No account? <a href="/register">Register</a></p>
+</div>
+
+<script>
+    function login() {
+        const savedUser = JSON.parse(localStorage.getItem("user"));
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        if (!savedUser) {
+            alert("No user found. Please register first.");
+            return;
+        }
+
+        if (email === savedUser.email && password === savedUser.password) {
+            alert("Login successful!");
+            // redirect to dashboard
+            // window.location.href = "dashboard.html";
+        } else {
+            alert("Invalid email or password!");
+        }
+    }
+</script>
+
+</body>
+</html>
