@@ -8,35 +8,26 @@ class Database:
     _instance = None
 
     def __new__(cls):
-        # Singleton Pattern: Taaki baar-bar connection na banana pade
         if cls._instance is None:
             cls._instance = super(Database, cls).__new__(cls)
-            
-            # LOCAL CONNECTION
             try:
-                # Agar MongoDB localhost par chal raha hai
                 cls._instance.client = MongoClient("mongodb://localhost:27017/")
-                # Connection Test
                 cls._instance.client.admin.command('ping')
                 print(" Database Connected Successfully!")
             except Exception as e:
                 print(f" Database Connection Error: {e}")
                 
-            # Database aur Collections (Tables) set karna
             cls._instance.db = cls._instance.client.mental_health_bot
             cls._instance.users = cls._instance.db.users
             cls._instance.mood_logs = cls._instance.db.mood_logs
             
-            # Indexing (Fast search ke liye)
             cls._instance.users.create_index([("username", ASCENDING)], unique=True)
             cls._instance.mood_logs.create_index([("user_id", ASCENDING), ("timestamp", DESCENDING)])
             
         return cls._instance
 
-    # --- 1. USER LOGIN / SIGNUP ---
     def create_user(self, username, password):
         try:
-            # Password ko encrypt karke save karenge (Security ke liye)
             hashed_password = generate_password_hash(password)
             user_id = self.users.insert_one({
                 "username": username,
@@ -45,24 +36,19 @@ class Database:
             }).inserted_id
             return str(user_id)
         except pymongo.errors.DuplicateKeyError:
-            return None # Username pehle se kisi ne le liya hai
+            return None 
 
     def verify_user(self, username, password):
         user = self.users.find_one({"username": username})
-        # Check karega ki password sahi hai ya nahi
         if user and check_password_hash(user['password'], password):
             return user
         return None
 
-    # --- 2. MOOD TRACKING ---
-    def add_mood(self, user_id, mood_score, emotion_label, note):
-        # Fix: Agar User ID kharab hai, toh nayi bana lo par data SAVE karo!
+    def add_mood(self, user_id, mood_score, emotion_label, message):
         try:
             if not user_id or not ObjectId.is_valid(str(user_id)):
-                # Agar ID valid nahi hai, toh ek nayi temporary ID bana do
                 valid_user_id = ObjectId()
             else:
-                # Agar sahi hai toh wahi use karo
                 valid_user_id = ObjectId(user_id)
         except Exception:
             valid_user_id = ObjectId()
@@ -70,39 +56,87 @@ class Database:
         log = {
             "user_id": valid_user_id,
             "mood_score": mood_score,
-            "emotion_label": emotion_label,
-            "note": note,
+            "emotion_label": emotion_label,  # DB me 'emotion_label' hi rahega
+            "message": message,
             "timestamp": datetime.now()
         }
-        
-        # Save to Database
         self.mood_logs.insert_one(log)
-        
-    def get_dashboard_data(self, user_id, limit=30):
-        if not ObjectId.is_valid(user_id):
-            return []
+
+    # --- CHAT RESTORE FIX ---
+    def get_chat_history(self, user_id):
+        try:
+            if not ObjectId.is_valid(user_id):
+                return []
             
-        cursor = self.mood_logs.find(
-            {"user_id": ObjectId(user_id)},
-            {"mood_score": 1, "timestamp": 1, "emotion_label": 1, "_id": 0}
-        ).sort("timestamp", DESCENDING).limit(limit)
-        return list(cursor)[::-1]
+            history = list(self.mood_logs.find({"user_id": ObjectId(user_id)}).sort("timestamp", -1).limit(20))
+            
+            for chat in history:
+                chat['_id'] = str(chat['_id'])
+                chat['timestamp'] = chat['timestamp'].strftime("%Y-%m-%d %H:%M")
+                
+                # 🔥 FIX: Frontend 'emotion' maangta hai, DB 'emotion_label' deta hai
+                raw_emotion = chat.get('emotion_label', 'Neutral')
+                chat['emotion'] = raw_emotion.capitalize() if raw_emotion else "Neutral"
+                
+                # 🔥 FIX: Message key ensure karna
+                chat['message'] = chat.get('message', chat.get('note', ''))
+                
+            return history
+        except Exception as e:
+            print(f"Error fetching history: {e}")
+            return []
 
-    # --- 3. DATA CLEANUP ---
-    def delete_data(self, user_id, scope):
-        if not ObjectId.is_valid(user_id):
-            return "Invalid User ID"
+    # --- INSIGHTS FIX ---
+    def get_user_insights(self, user_id):
+        try:
+            if not ObjectId.is_valid(user_id):
+                return None
 
-        if scope == 'all':
-            result = self.mood_logs.delete_many({"user_id": ObjectId(user_id)})
-            return f"Deleted {result.deleted_count} records."
-        elif scope == 'today':
-            start_of_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            result = self.mood_logs.delete_many({
-                "user_id": ObjectId(user_id),
-                "timestamp": {"$gte": start_of_day}
-            })
-            return f"Deleted {result.deleted_count} records from today."
+            logs = list(self.mood_logs.find({"user_id": ObjectId(user_id)}).sort("timestamp", 1))
 
-# Initialize
+            if not logs:
+                return None
+
+            # Keys must match script2.js (Capitalized)
+            counts = {"Happy": 0, "Sad": 0, "Anxious": 0, "Neutral": 0, "Angry": 0, "Stressed": 0}
+            
+            recent_logs = logs[-7:] 
+            chart_labels = []
+            chart_data = []
+
+            last_log = logs[-1]
+            today_score = last_log.get("mood_score", 5)
+            today_label = last_log.get("emotion_label", "Neutral").capitalize()
+
+            for log in logs:
+                # 🔥 FIX: Lowercase ko Capitalize karo (sad -> Sad) taaki graph match kare
+                raw_emotion = log.get("emotion_label", "Neutral")
+                emotion = raw_emotion.capitalize() if raw_emotion else "Neutral"
+                
+                # Handle Synonyms
+                if "Stress" in emotion: emotion = "Stressed"
+                if "Tired" in emotion: emotion = "Neutral" # Map tired to neutral or add category
+
+                if emotion in counts:
+                    counts[emotion] += 1
+                else:
+                    counts["Neutral"] += 1
+
+            for log in recent_logs:
+                day_name = log["timestamp"].strftime("%a")
+                chart_labels.append(day_name)
+                chart_data.append(log.get("mood_score", 5))
+
+            return {
+                "current_mood": today_label,
+                "current_score": today_score,
+                "counts": counts,
+                "trend_labels": chart_labels,
+                "trend_data": chart_data
+            }
+
+        except Exception as e:
+            print(f"Error getting insights: {e}")
+            return None
+
 db_helper = Database()

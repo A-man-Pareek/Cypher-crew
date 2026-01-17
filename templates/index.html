@@ -3,48 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serene - Mental Health Bot</title>
+    <title>Serene - Mental Health Bot 🌿</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Glassmorphism Container */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border-radius: 24px;
+            display: flex;
+            width: 90vw;
+            height: 85vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background: rgba(38, 84, 40, 0.4); /* Pastel Green Tint */
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Chat Area Customization */
+        #chat-box {
+            /* Overriding style.css basic box to fit new layout */
+            background: transparent !important;
+            box-shadow: none !important;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        
+        /* Hide Scrollbar for cleaner look */
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        /* Input Area Styling matches image */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* --- 🔥 LOGIC TO CHANGE TEXT COLOR ON MOOD CHANGE 🔥 --- */
+        body.mood-sad #sidebar-title, body.mood-sad #header-title, body.mood-sad #header-subtitle,
+        body.mood-happy #sidebar-title, body.mood-happy #header-title, body.mood-happy #header-subtitle,
+        body.mood-angry #sidebar-title, body.mood-angry #header-title, body.mood-angry #header-subtitle,
+        body.mood-stressed #sidebar-title, body.mood-stressed #header-title, body.mood-stressed #header-subtitle,
+        body.mood-tired #sidebar-title, body.mood-tired #header-title, body.mood-tired #header-subtitle {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4); /* Slight shadow for better readability */
+            transition: color 0.5s ease;
+        }
+
+    </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <h1> Serene Bot</h1>
+    <div class="glass-container">
         
-        <div id="chat-box">
-            <div class="bot-msg">Hello! I am here to listen. How are you feeling?</div>
-        </div>
+        <aside class="sidebar w-1/4 flex flex-col items-center py-8 hidden md:flex">
+            <h1 id="sidebar-title" class="text-2xl font-bold text-gray-700 mb-10 tracking-wide">ZEN AI</h1>
+            
+            <div class="flex flex-col space-y-4 w-3/4">
+<button id="new-chat-btn" class="nav-btn py-3 rounded-xl text-gray-700 font-medium text-sm">New Chat</button>                
 
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your feelings here..." autocomplete="off">
-            <button id="send-btn">Send</button>
+<button onclick="window.location.href='/insight'" class="nav-btn py-3 rounded-xl text-gray-700 font-medium text-sm">
+    Chat Insights
+<button id="venting-btn" class="nav-btn py-3 rounded-xl text-gray-700 font-medium text-sm">Venting Mode</button>                
+                <button class="nav-btn py-2 rounded-xl text-red-500 hover:text-red-700 text-xs">Delete Chat</button>
+            </div>
+            
+            <div class="mt-auto">
+                <a href="/logout" class="text-gray-500 hover:text-gray-800 text-sm font-semibold">Log Out</a>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative bg-white/10">
+            
+            <header class="p-6 border-b border-white/40 text-center">
+                <h2 id="header-title" class="text-xl font-bold text-slate-700">Your Safe Mental Space</h2>
+                <p id="header-subtitle" class="text-slate-500 text-xs mt-1">You are loved. You are not alone.</p>
+            </header>
+
+            <div class="flex-1 relative overflow-hidden">
+                <div id="chat-box" class="w-full h-full pb-24">
+                    <div class="bot-msg">Hello! I am here to listen. How are you feeling?</div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-6 left-0 right-0 px-8 flex justify-center">
+                <div class="glass-input flex items-center w-full max-w-2xl p-2">
+                    <input type="text" id="user-input" 
+                        class="flex-1 bg-transparent border-none outline-none px-4 text-gray-700 placeholder-gray-400"
+                        placeholder="Type your feelings here..." autocomplete="off">
+                    <button id="mic-btn" class="p-3 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 transition focus:outline-none mr-2 flex items-center justify-center">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+</button>
+</button>
+                    <button id="send-btn" class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full p-3 ml-2 transition duration-200 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="breathing-container">
+        <div class="breathing-wrapper">
+            <div class="circle-layer layer-1"></div>
+            <div class="circle-layer layer-2"></div>
+            <div class="circle-layer layer-3"></div>
+            <div class="instruction-text" id="breath-text">Inhale...</div>
         </div>
     </div>
 
-   <div id="breathing-container">
-    <div class="breathing-wrapper">
-        <div class="circle-layer layer-1"></div>
-        <div class="circle-layer layer-2"></div>
-        <div class="circle-layer layer-3"></div>
-        <div class="instruction-text" id="breath-text">Inhale...</div>
-    </div>
-</div>
-   <div id="yoga-card">
-    <div class="card-header">
-        <h3>🧘‍♀️ Quick Relief</h3>
-        <span class="close-btn" onclick="closeYogaCard()">×</span>
-    </div>
     
-    <div class="visual-container">
-        <img id="yoga-visual" src="" alt="Yoga Exercise">
-    </div>
 
-    <p id="yoga-instruction">Loading exercise...</p>
-</div>
+    <div id="mood-overlay"></div>
+
+    <audio id="audio-rain" loop src="https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d0.mp3"></audio>
+    <audio id="audio-birds" loop src="https://cdn.pixabay.com/audio/2022/03/09/audio_c8c91a3327.mp3"></audio>
+    <audio id="audio-stream" loop src="https://cdn.pixabay.com/audio/2021/09/06/audio_4eb65cc791.mp3"></audio>
+    <audio id="audio-fire" loop src="https://cdn.pixabay.com/audio/2021/08/09/audio_0dcdd333b2.mp3"></audio>
+    <audio id="audio-night" loop src="https://cdn.pixabay.com/audio/2021/08/04/audio_3d12d93e18.mp3"></audio>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-<div id="mood-overlay"></div>
 
-<audio id="audio-rain" loop src="https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d0.mp3"></audio> <audio id="audio-birds" loop src="https://cdn.pixabay.com/audio/2022/03/09/audio_c8c91a3327.mp3"></audio> <audio id="audio-stream" loop src="https://cdn.pixabay.com/audio/2021/09/06/audio_4eb65cc791.mp3"></audio> <audio id="audio-fire" loop src="https://cdn.pixabay.com/audio/2021/08/09/audio_0dcdd333b2.mp3"></audio> <audio id="audio-night" loop src="https://cdn.pixabay.com/audio/2021/08/04/audio_3d12d93e18.mp3"></audio> 
+</body>
 </html>

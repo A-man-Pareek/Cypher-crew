@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Mood History</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="background-blob blob-1"></div>
+    <div class="background-blob blob-2"></div>
+
+    <div class="container">
+        
+        <header>
+            <a href="/chat" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Chat</a>
+            <h1>Your Emotional Journey</h1>
+            <p>Analysis of your recent conversations</p>
+        </header>
+
+        <div class="today-mood-card">
+            <div class="card-header">
+                <div>
+                    <h2>Current Vibe</h2>
+                    <p id="mood-text-display">Measuring...</p>
+                </div>
+                <div class="current-icon-box">
+                    <i id="main-mood-icon" class="fas fa-circle-notch fa-spin"></i>
+                </div>
+            </div>
+
+            <div class="meter-container">
+                <div class="mood-gradient-bar"></div>
+                <div class="mood-pointer" id="mood-pointer">
+                    <div class="pointer-label" id="pointer-score">50%</div>
+                    <div class="pointer-knob"></div>
+                </div>
+            </div>
+
+            <div class="meter-labels">
+                <span>😞 Low</span>
+                <span>😐 Neutral</span>
+                <span>⚡ High</span>
+            </div>
+            
+            <div class="daily-tip" id="daily-tip">Loading insights from database...</div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card happy">
+                <div class="icon-box"><i class="fas fa-smile-beam"></i></div>
+                <div class="info"><h3>Happy Logs</h3><span id="happy-count">0</span></div>
+            </div>
+            <div class="stat-card sad">
+                <div class="icon-box"><i class="fas fa-cloud-rain"></i></div>
+                <div class="info"><h3>Sad Logs</h3><span id="sad-count">0</span></div>
+            </div>
+            <div class="stat-card anxious">
+                <div class="icon-box"><i class="fas fa-wind"></i></div>
+                <div class="info"><h3>Anxious Logs</h3><span id="anxious-count">0</span></div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card large">
+                <h3>Mood Trend</h3>
+                <div class="canvas-container"><canvas id="trendChart"></canvas></div>
+            </div>
+            <div class="chart-card small">
+                <h3>Mood Distribution</h3>
+                <div class="canvas-container"><canvas id="pieChart"></canvas></div>
+            </div>
+        </div>
+
+    </div>
+
+<script src="{{ url_for('static', filename='script2.js') }}?v=2"></script>
+</body>
+</html>

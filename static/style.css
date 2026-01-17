@@ -19,9 +19,20 @@ body {
     flex-direction: column;
 }
 
+/* --- MIC ANIMATION --- */
+.mic-active {
+    background-color: #ff4b4b !important;
+    color: white !important;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 75, 75, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0); }
+}
 h1 {
-    background-color: #4A90E2;
-    color: white;
+    color: rgb(171, 99, 99);
     margin: 0;
     padding: 15px;
     text-align: center;
@@ -249,38 +260,38 @@ button {
 
 /* 1. SAD (Dark & Rainy) */
 body.mood-sad #mood-overlay {
-    background-image: url('https://media.giphy.com/media/t7Qb8655Z1oHF4DVU7/giphy.gif');
-    background-color: rgba(20, 30, 40, 0.95); /* Very Dark Blue */
+    background-image: url('/static/gif/sad.gif');
+    background-color: rgba(109, 112, 205, 0.95); /* Very Dark Blue */
     opacity: 0.9;
 }
 body.mood-sad { color: #d1d8e0; } /* Text light grey */
 
 /* 2. HAPPY (Bright & Sunny) */
 body.mood-happy #mood-overlay {
-    background-image: url('https://media.giphy.com/media/TvFCUSiRUfeIU/giphy.gif'); /* Blue Sky */
+    background-image: url('/static/gif/happy.gif'); /* Blue Sky */
     background-color: rgba(255, 240, 200, 0.4); /* Sunny Yellow tint */
     opacity: 0.8;
 }
 
 /* 3. STRESSED (Green Forest - Calming) */
 body.mood-stressed #mood-overlay {
-    background-image: url('https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif'); /* Forest */
+    background-image: url('/static/gif/anxious.gif'); /* Forest */
     background-color: rgba(46, 125, 50, 0.7); /* Deep Green */
     opacity: 0.8;
 }
 
 /* 4. ANGRY (Cozy Fireplace - To calm down) */
 body.mood-angry #mood-overlay {
-    background-image: url('https://media.giphy.com/media/3o7rc0qU6m5BcMCfDy/giphy.gif'); /* Slow Fire */
+    background-image: url('/static/gif/angry.gif'); /* Slow Fire */
     background-color: rgba(80, 20, 20, 0.8); /* Warm Dark Red */
     opacity: 0.85;
 }
 
 /* 5. TIRED (Starry Night) */
 body.mood-tired #mood-overlay {
-    background-image: url('https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif'); /* Use Starry GIF here if available, currently forest fallback */
+    background-image: url('/static/gif/tired.gif'); /* Use Starry GIF here if available, currently forest fallback */
     background-color: rgba(10, 10, 30, 0.95); /* Midnight Blue */
-    background-image: url('https://media.giphy.com/media/Tyq0rbANCi676/giphy.gif'); /* Stars */
+   
     opacity: 0.9;
 }
 body.mood-tired { color: #bdc3c7; }
