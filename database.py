@@ -63,25 +63,34 @@ class Database:
         self.mood_logs.insert_one(log)
 
     # --- CHAT RESTORE FIX ---
+   # --- CHAT RESTORE FIX (JSON ID ERROR SOLVED) ---
     def get_chat_history(self, user_id):
         try:
             if not ObjectId.is_valid(user_id):
                 return []
             
+            # 1. Fetch data from MongoDB
             history = list(self.mood_logs.find({"user_id": ObjectId(user_id)}).sort("timestamp", -1).limit(20))
             
+            cleaned_history = []
             for chat in history:
-                chat['_id'] = str(chat['_id'])
-                chat['timestamp'] = chat['timestamp'].strftime("%Y-%m-%d %H:%M")
+                # 2. 🔥 Sabse Zaroori Step: ObjectId ko String banao
+                chat_id_str = str(chat['_id'])
                 
-                # 🔥 FIX: Frontend 'emotion' maangta hai, DB 'emotion_label' deta hai
-                raw_emotion = chat.get('emotion_label', 'Neutral')
-                chat['emotion'] = raw_emotion.capitalize() if raw_emotion else "Neutral"
+                # 3. Data clean karo (Handle missing keys)
+                chat_data = {
+                    "_id": chat_id_str, # String format mein ID
+                    "message": chat.get('message', chat.get('note', '')),
+                    # Agar 'emotion' save hai toh wo lo, nahi toh 'emotion_label' check karo
+                    "emotion": chat.get('emotion', chat.get('emotion_label', 'Neutral')),
+                    "timestamp": chat['timestamp'].strftime("%Y-%m-%d %H:%M")
+                }
                 
-                # 🔥 FIX: Message key ensure karna
-                chat['message'] = chat.get('message', chat.get('note', ''))
+                # 4. Clean list mein daalo
+                cleaned_history.append(chat_data)
                 
-            return history
+            return cleaned_history
+
         except Exception as e:
             print(f"Error fetching history: {e}")
             return []
@@ -138,5 +147,17 @@ class Database:
         except Exception as e:
             print(f"Error getting insights: {e}")
             return None
-
+# --- DELETE HISTORY FUNCTION ---
+    def delete_chat_history(self, user_id):
+        try:
+            if not ObjectId.is_valid(user_id):
+                return False
+            
+            # User ke saare mood logs delete kar do
+            result = self.mood_logs.delete_many({"user_id": ObjectId(user_id)})
+            return result.deleted_count > 0
+        except Exception as e:
+            print(f"Error deleting history: {e}")
+            return False
+        
 db_helper = Database()

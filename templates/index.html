@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serene - Mental Health Bot 🌿</title>
+    <title>Zen AI - Mental Health Bot </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -14,21 +14,22 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
+            background: linear-gradient(135deg, #d6ccd5 0%, #d6ccd5 100%);
             height: 100vh;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 1s ease;
         }
 
         /* Glassmorphism Container */
         .glass-container {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(10, 33, 33, 0.666);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             border-radius: 24px;
             display: flex;
             width: 90vw;
@@ -36,27 +37,38 @@
             overflow: hidden;
         }
 
-        /* Sidebar Styling */
+        /* --- 🔥 DYNAMIC SIDEBAR TINT 🔥 --- */
         .sidebar {
-            background: rgba(38, 84, 40, 0.4); /* Pastel Green Tint */
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            /* Default Tint */
+            background: var(--sidebar-tint, #c8b5a7) !important;
+            backdrop-filter: blur(15px);
+            border-right: 1px solid black;
+            transition: background 1s ease;
         }
 
+        /* Sidebar Button Refinement */
         .nav-btn {
-            background: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: inherit;
             transition: all 0.3s ease;
         }
+
         .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.4);
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+
+        /* Mood Specific Sidebar Tints */
+        body.mood-happy { --sidebar-tint: rgba(255, 255, 200, 0.2); } 
+        body.mood-sad { --sidebar-tint: rgba(0, 0, 50, 0.25); }
+        body.mood-angry { --sidebar-tint: rgba(100, 0, 0, 0.2); }
+        body.mood-stressed { --sidebar-tint: rgba(50, 50, 50, 0.3); }
+        body.mood-tired { --sidebar-tint: rgba(100, 100, 150, 0.2); }
 
         /* Chat Area Customization */
         #chat-box {
-            /* Overriding style.css basic box to fit new layout */
             background: transparent !important;
             box-shadow: none !important;
             height: 100%;
@@ -65,25 +77,27 @@
             scroll-behavior: smooth;
         }
         
-        /* Hide Scrollbar for cleaner look */
         #chat-box::-webkit-scrollbar { width: 6px; }
-        #chat-box::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+        #chat-box::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        /* Input Area Styling matches image */
+        /* Input Area Styling */
         .glass-input {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* --- 🔥 LOGIC TO CHANGE TEXT COLOR ON MOOD CHANGE 🔥 --- */
+        /* --- 🔥 TEXT READABILITY ON MOOD CHANGE 🔥 --- */
         body.mood-sad #sidebar-title, body.mood-sad #header-title, body.mood-sad #header-subtitle,
-        body.mood-happy #sidebar-title, body.mood-happy #header-title, body.mood-happy #header-subtitle,
+        body.mood-sad .nav-btn, body.mood-sad a,
         body.mood-angry #sidebar-title, body.mood-angry #header-title, body.mood-angry #header-subtitle,
+        body.mood-angry .nav-btn, body.mood-angry a,
         body.mood-stressed #sidebar-title, body.mood-stressed #header-title, body.mood-stressed #header-subtitle,
-        body.mood-tired #sidebar-title, body.mood-tired #header-title, body.mood-tired #header-subtitle {
+        body.mood-stressed .nav-btn, body.mood-stressed a {
             color: #ffffff !important;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4); /* Slight shadow for better readability */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
             transition: color 0.5s ease;
         }
 
@@ -102,8 +116,9 @@
 <button onclick="window.location.href='/insight'" class="nav-btn py-3 rounded-xl text-gray-700 font-medium text-sm">
     Chat Insights
 <button id="venting-btn" class="nav-btn py-3 rounded-xl text-gray-700 font-medium text-sm">Venting Mode</button>                
-                <button class="nav-btn py-2 rounded-xl text-red-500 hover:text-red-700 text-xs">Delete Chat</button>
-            </div>
+<button id="delete-btn" class="nav-btn py-3 rounded-xl text-gray-700 font-medium text-sm text-red-500">
+    <i class="fas fa-trash-alt mr-2"></i> Delete History
+</button>            </div>
             
             <div class="mt-auto">
                 <a href="/logout" class="text-gray-500 hover:text-gray-800 text-sm font-semibold">Log Out</a>
