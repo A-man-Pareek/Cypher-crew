@@ -106,25 +106,19 @@ class Database:
             if not logs:
                 return None
 
-            # Keys must match script2.js (Capitalized)
+            # Keys must match script2.js exactly (Capitalized)
             counts = {"Happy": 0, "Sad": 0, "Anxious": 0, "Neutral": 0, "Angry": 0, "Stressed": 0}
             
             recent_logs = logs[-7:] 
             chart_labels = []
             chart_data = []
 
-            last_log = logs[-1]
-            today_score = last_log.get("mood_score", 5)
-            today_label = last_log.get("emotion_label", "Neutral").capitalize()
-
             for log in logs:
-                # 🔥 FIX: Lowercase ko Capitalize karo (sad -> Sad) taaki graph match kare
+                # 🔥 FIX: Emotion ko capitalize karo taaki counts dictionary se match kare
                 raw_emotion = log.get("emotion_label", "Neutral")
-                emotion = raw_emotion.capitalize() if raw_emotion else "Neutral"
+                emotion = raw_emotion.strip().capitalize() if raw_emotion else "Neutral"
                 
-                # Handle Synonyms
                 if "Stress" in emotion: emotion = "Stressed"
-                if "Tired" in emotion: emotion = "Neutral" # Map tired to neutral or add category
 
                 if emotion in counts:
                     counts[emotion] += 1
@@ -136,9 +130,10 @@ class Database:
                 chart_labels.append(day_name)
                 chart_data.append(log.get("mood_score", 5))
 
+            last_log = logs[-1]
             return {
-                "current_mood": today_label,
-                "current_score": today_score,
+                "current_mood": last_log.get("emotion_label", "Neutral").capitalize(),
+                "current_score": last_log.get("mood_score", 5),
                 "counts": counts,
                 "trend_labels": chart_labels,
                 "trend_data": chart_data

@@ -20,7 +20,24 @@ YOGA_SOLUTIONS = {
     "tired": {"tip": "Side Stretch", "gif": "/static/tired.gif"},
     "stress": {"tip": "Shoulder Roll", "gif": "/static/stress.gif"}
 }
-
+@app.route('/get_insights_api', methods=['GET'])
+def get_insights_api():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "User not logged in"})
+    
+    try:
+        uid = session.get('user_id')
+        # Database helper se insights fetch karo
+        insights = db_helper.get_user_insights(uid)
+        
+        if insights:
+            return jsonify({"success": True, "insights": insights})
+        else:
+            return jsonify({"success": False, "message": "No mood data found yet."})
+            
+    except Exception as e:
+        print(f"[ERROR] Insights API: {e}")
+        return jsonify({"success": False, "error": str(e)})
 # --- ROUTES ---
 @app.route('/')
 def index():
@@ -51,7 +68,25 @@ def insight_page():
     if 'user_id' not in session:
         return redirect(url_for('login_page'))
     return render_template('insight.html')
-
+@app.route('/insight_api', methods=['GET'])
+def insight_api():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "User not logged in"})
+    
+    try:
+        uid = session.get('user_id')
+        # Database helper se insights fetch karo
+        insights = db_helper.get_user_insights(uid)
+        
+        if insights:
+            # 🔥 'data' key bhejni hai kyunki script2.js 'apiResponse.data' maang raha hai
+            return jsonify({"success": True, "data": insights})
+        else:
+            return jsonify({"success": False, "message": "No mood data found yet."})
+            
+    except Exception as e:
+        print(f"[ERROR] Insights API: {e}")
+        return jsonify({"success": False, "error": str(e)})
 @app.route('/logout')
 def logout():
     session.clear()
